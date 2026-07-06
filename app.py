@@ -445,8 +445,8 @@ def _terminate_proc():
 # Dev server with robust auto-open
 # --------------------------------------------------------------------------------------
 if __name__ == "__main__":
-    HOST = "127.0.0.1"
-    PORT = 5000
+    HOST = "0.0.0.0"
+    PORT = 10000
     URL  = f"http://{HOST}:{PORT}#CPSC"  # change to '#run' if your front-end anchors expect that
 
     def wait_and_open(url: str, host: str, port: int, timeout: float = 10.0):
