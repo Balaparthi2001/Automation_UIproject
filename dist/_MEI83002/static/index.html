@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Automation Control Panel</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles.css" />
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
+  <!-- App JS -->
+  <script src="/static/app.js" defer></script>
+</head>
+<body>
+  <!-- Background gradient + blobs -->
+  <div class="bg">
+    <div class="blob b1"></div>
+    <div class="blob b2"></div>
+    <div class="blob b3"></div>
+  </div>
+
+  <header class="app-header">
+    <div class="title3d">
+      <span>A</span><span>u</span><span>t</span><span>o</span><span>m</span><span>a</span><span>t</span><span>i</span><span>o</span><span>n</span>
+      <span>&nbsp;</span>
+      <span>C</span><span>o</span><span>n</span><span>t</span><span>r</span><span>o</span><span>l</span>
+      <span>&nbsp;</span>
+      <span>P</span><span>a</span><span>n</span><span>e</span><span>l</span>
+    </div>
+    <div class="sub">Local • Fast • Safe</div>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Sections">
+    <button class="tab-btn" data-tab="upload" role="tab" aria-selected="false" aria-controls="upload" id="tab-upload">
+      <span class="icon">⬆️</span> New Upload
+    </button>
+    <button class="tab-btn active" data-tab="run" role="tab" aria-selected="true" aria-controls="run" id="tab-run">
+      <span class="icon">⚙️</span> Use File
+    </button>
+    <button class="tab-btn" data-tab="update" role="tab" aria-selected="false" aria-controls="update" id="tab-update">
+      <span class="icon">✏️</span> Update File
+    </button>
+  </nav>
+
+  <main class="content">
+
+    <!-- Upload (admin) -->
+    <section class="tab-panel" id="upload" role="tabpanel" aria-labelledby="tab-upload">
+      <div class="panel glass fade-in">
+        <h3>Upload new automation (<code>.py</code>)</h3>
+        <div class="grid">
+          <div class="field">
+            <label class="label">Choose file</label>
+            <label class="filedrop" id="drop-upload">
+              <input type="file" id="u_file" accept=".py" hidden />
+              <div class="hint">
+                <div class="big">Drag &amp; Drop</div>
+                <div class="small">or click to select .py</div>
+              </div>
+            </label>
+          </div>
+          <div class="field">
+            <label class="label">Save as</label>
+            <input class="input" type="text" id="u_name" placeholder="example: Label_1/task1.py or task1.py" />
+          </div>
+          <div class="field">
+            <label class="label">Category (optional)</label>
+            <input class="input" type="text" id="u_cat" placeholder="Label_1" />
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn3d primary" id="btn-upload"><span>Upload</span></button>
+          <div class="msg" id="upload-msg"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Run (DEFAULT ACTIVE) -->
+    <section class="tab-panel active" id="run" role="tabpanel" aria-labelledby="tab-run">
+      <div class="panel glass fade-in">
+        <h3>Run Automation</h3>
+        <div class="toolbar">
+          <input class="input search" id="search" placeholder="Select a label to search…" disabled />
+          <button class="chip" id="clear-search" title="Clear search">✖ Clear</button>
+        </div>
+
+        <div class="layout">
+          <div class="left">
+            <!-- Header shown when inside a label -->
+            <div id="label-header" class="label-header hidden">
+              <button class="chip back" id="btn-back" >←</button>
+              <div class="label-title">
+                <span id="label-name">Label</span>
+                <span id="label-count" class="count-badge"> 0</span>
+              </div>
+            </div>
+
+            <!-- Labels list (default) -->
+            <div id="label-list" class="labels scroll-trendy"></div>
+         
+
+            <!-- Files inside selected label -->
+            <div id="file-list" class="filecards scroll-trendy hidden"></div>
+          </div>
+
+          <div class="right">
+            <!-- Editor card (ephemeral) -->
+            <div class="panel glass editor-card">
+              <div class="editor-header">
+                <div class="editor-title">Code (temporary editor)</div>
+                <div class="editor-actions">
+                  <button class="chip" id="btn-reload-base">↺ Reload Base</button>
+                  <button class="chip primary" id="btn-run-base">▶ Run Base</button>
+                  <button class="chip" id="btn-run-edited">⚡ Run Edited (no save)</button>
+                </div>
+              </div>
+              <textarea id="editor" class="editor" spellcheck="false" placeholder="Select a file to view/edit here…"></textarea>
+              <div class="editor-hint">Edits here are not saved. Closing or navigating away discards changes. Base file never changes.</div>
+            </div>
+
+            <div class="terminal-wrap" style="display: grid !important;">
+              <div class="term-header">
+                <div class="dots">
+                  <span class="r"></span><span class="y"></span><span class="g"></span>
+                </div>
+                <div class="title">Terminal</div>
+                <div class="spacer"></div>
+                <button class="chip danger" id="btn-stop" disabled>⛔ Stop</button>
+              </div>
+              <pre id="terminal" class="terminal"></pre>
+            </div>
+            <div class="run-msg" id="run-msg"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Update (admin) -->
+    <section class="tab-panel" id="update" role="tabpanel" aria-labelledby="tab-update">
+      <div class="panel glass fade-in">
+        <h3>Update existing file</h3>
+        <div class="grid">
+          <div class="field">
+            <label class="label">Select target</label>
+            <div class="inline">
+              <select class="input" id="update-target"></select>
+              <button class="chip" id="refresh-targets">🔄</button>
+            </div>
+          </div>
+          <div class="field">
+            <label class="label">New version</label>
+            <label class="filedrop" id="drop-update">
+              <input type="file" id="update-file" accept=".py" hidden />
+              <div class="hint">
+                <div class="big">Drop file</div>
+                <div class="small">or click to select</div>
+              </div>
+            </label>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn3d success" id="btn-update"><span>Update</span></button>
+          <div class="msg" id="update-msg"></div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="foot">Built for local automation • v1.2</footer>
+</body>
+</html>
