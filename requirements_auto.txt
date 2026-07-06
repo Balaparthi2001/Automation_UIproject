@@ -2,7 +2,7 @@ flask
 pandas
 openpyxl
 xlrd
-pypdf
+PyPDF2
 PyMuPDF
 opencv-python
 pytesseract
