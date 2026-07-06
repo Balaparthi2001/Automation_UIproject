@@ -16,21 +16,22 @@ __pycache__/
 *.egg-info/
 *.egg
 .eggs/
+*.pyd
 
 # Logs
 logs/
 *.log
 
-# Temporary files
+# Temporary / runtime files
 tmp_runs/
 uploads/
 
-# Dependencies (binary distributions)
+# System dependencies (install separately, do not bundle in repo)
 py/
 Tesseract-OCR/
 poppler-*/
 
-# IDE
+# IDE & editor files
 .vscode/
 .idea/
 *.swp
@@ -38,3 +39,4 @@ poppler-*/
 *~
 .DS_Store
 Thumbs.db
+*.pyc
