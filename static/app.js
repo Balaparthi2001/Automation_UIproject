@@ -59,7 +59,7 @@ tabBtns.forEach(btn => {
   const params = new URLSearchParams(location.search);
   const qsTab = params.get("tab");
   const hashTab = location.hash ? location.hash.slice(1) : null;
-  const allowed = new Set(["upload", "run", "update"]);
+  const allowed = new Set(["upload", "excel", "run", "update"]);
   let initial = "run";
   if (qsTab && allowed.has(qsTab)) initial = qsTab;
   else if (hashTab && allowed.has(hashTab)) initial = hashTab;
@@ -115,6 +115,7 @@ function wireDrop(zoneId, inputId){
 }
 wireDrop("drop-upload", "u_file");
 wireDrop("drop-update", "update-file");
+wireDrop("drop-excel", "excel_file");
 
 /************ Elements ************/
 const labelHeader  = document.getElementById("label-header");
@@ -386,6 +387,53 @@ document.getElementById("btn-upload")?.addEventListener("click", async () =>{
     }
     await listFiles();
   }catch(e){
+    Swal.fire({ icon:'error', title:'Upload error', text: e.message });
+  }
+});
+
+/************ Excel Upload & Process ************/
+document.getElementById("btn-upload-excel")?.addEventListener("click", async () =>{
+  try{
+    const excelMsg = document.getElementById("excel-msg");
+    if (excelMsg) excelMsg.textContent = "";
+    
+    const f = document.getElementById("excel_file").files[0];
+
+    if(!f) {
+      Swal.fire({ icon:'warning', title:'Select Excel file' });
+      return;
+    }
+
+    // Validate file extension
+    const fileName = f.name.toLowerCase();
+    if (!fileName.endsWith('.xlsx') && !fileName.endsWith('.xls')) {
+      Swal.fire({ icon:'error', title:'Only Excel files (.xlsx, .xls) are allowed' });
+      return;
+    }
+
+    const fd = new FormData();
+    fd.append("file", f);
+
+    if (excelMsg) excelMsg.textContent = "Uploading and processing...";
+
+    const data = await api("/upload_excel", { method: "POST", body: fd });
+    
+    if (data.ok) {
+      if (excelMsg) excelMsg.textContent = "";
+      Swal.fire({ 
+        icon:'success', 
+        title:'Excel processed successfully', 
+        text: data.message || 'File uploaded and processed',
+        timer: 2000, 
+        showConfirmButton:false 
+      });
+    } else {
+      if (excelMsg) excelMsg.textContent = "";
+      Swal.fire({ icon:'error', title:'Processing failed', text: data.error || 'Unknown error' });
+    }
+  }catch(e){
+    const excelMsg = document.getElementById("excel-msg");
+    if (excelMsg) excelMsg.textContent = "";
     Swal.fire({ icon:'error', title:'Upload error', text: e.message });
   }
 });

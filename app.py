@@ -268,6 +268,57 @@ def update():
     f.save(dest)
     return jsonify({"ok": True, "target": target_rel})
 
+# ---------- Upload Excel for Robocopy ----------
+@app.post("/upload_excel")
+def upload_excel():
+    """
+    Upload Excel file for Robocopy automation.
+    Saves to uploads/input.xlsx and executes robocopy_files_from_excel.
+    """
+    if "file" not in request.files:
+        return jsonify({"ok": False, "error": "file required"}), 400
+
+    f = request.files["file"]
+    if not f.filename:
+        return jsonify({"ok": False, "error": "no file selected"}), 400
+
+    # Validate file extension
+    if not f.filename.lower().endswith(('.xlsx', '.xls')):
+        return jsonify({"ok": False, "error": "only Excel files (.xlsx, .xls) are allowed"}), 400
+
+    try:
+        # Save to uploads/input.xlsx
+        dest_path = UPLOAD_DIR / "input.xlsx"
+        f.save(dest_path)
+        
+        # Import and run Robocopy automation
+        import sys
+        import importlib.util
+        
+        # Load the Robocopy module
+        robocopy_path = AUTO_DIR / "Label_3" / "Robocopy.py"
+        if not robocopy_path.exists():
+            return jsonify({"ok": False, "error": f"Robocopy.py not found at {robocopy_path}"}), 500
+        
+        spec = importlib.util.spec_from_file_location("robocopy_module", robocopy_path)
+        if spec and spec.loader:
+            robocopy_module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(robocopy_module)
+            
+            # Execute the robocopy function
+            robocopy_module.robocopy_files_from_excel(str(dest_path))
+            
+            return jsonify({
+                "ok": True, 
+                "message": "Excel uploaded and processed successfully",
+                "file": str(dest_path.relative_to(BASE_DIR))
+            })
+        else:
+            return jsonify({"ok": False, "error": "failed to load Robocopy module"}), 500
+            
+    except Exception as e:
+        return jsonify({"ok": False, "error": str(e)}), 500
+
 # ---------- Delete (via query param to safely carry slashes) ----------
 @app.delete("/files")
 def delete_file():
@@ -445,6 +496,8 @@ def _terminate_proc():
 # Dev server with robust auto-open
 # --------------------------------------------------------------------------------------
 if __name__ == "__main__":
+    # HOST = "127.0.0.1"
+    # PORT = 5000
     HOST = "0.0.0.0"
     PORT = 10000
     URL  = f"http://{HOST}:{PORT}#CPSC"  # change to '#run' if your front-end anchors expect that

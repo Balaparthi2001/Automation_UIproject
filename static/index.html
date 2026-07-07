@@ -35,6 +35,9 @@
     <button class="tab-btn" data-tab="upload" role="tab" aria-selected="false" aria-controls="upload" id="tab-upload">
       <span class="icon">⬆️</span> New Upload
     </button>
+    <button class="tab-btn" data-tab="excel" role="tab" aria-selected="false" aria-controls="excel" id="tab-excel">
+      <span class="icon">📊</span> Excel Robocopy
+    </button>
     <button class="tab-btn active" data-tab="run" role="tab" aria-selected="true" aria-controls="run" id="tab-run">
       <span class="icon">⚙️</span> Use File
     </button>
@@ -132,6 +135,30 @@
             </div>
             <div class="run-msg" id="run-msg"></div>
           </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Excel Robocopy (admin) -->
+    <section class="tab-panel" id="excel" role="tabpanel" aria-labelledby="tab-excel">
+      <div class="panel glass fade-in">
+        <h3>Excel File Robocopy</h3>
+        <p class="hint-text">Upload an Excel file (.xlsx/.xls) with columns: <strong>Name</strong>, <strong>Folder Path</strong>, <strong>Destination Folder</strong></p>
+        <div class="grid">
+          <div class="field">
+            <label class="label">Choose Excel file</label>
+            <label class="filedrop" id="drop-excel">
+              <input type="file" id="excel_file" accept=".xlsx,.xls" hidden />
+              <div class="hint">
+                <div class="big">Drag & Drop Excel</div>
+                <div class="small">or click to select .xlsx/.xls</div>
+              </div>
+            </label>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn3d primary" id="btn-upload-excel"><span>Upload & Process</span></button>
+          <div class="msg" id="excel-msg"></div>
         </div>
       </div>
     </section>
